@@ -54,21 +54,21 @@ module.exports = class RighthandPanel {
       self._deps.udapp
    )
 
-    var analysisTab = new AnalysisTab(self._components.registry)
-    analysisTab.event.register('newStaticAnaysisWarningMessage', (msg, settings) => { self._components.compile.addWarning(msg, settings) })
+//    var analysisTab = new AnalysisTab(self._components.registry)
+//    analysisTab.event.register('newStaticAnaysisWarningMessage', (msg, settings) => { self._components.compile.addWarning(msg, settings) })
 
-    self._components.debuggerTab = new DebuggerTab(self._components.registry)
+//    self._components.debuggerTab = new DebuggerTab(self._components.registry)
 
     self._components = {
       pluginManager: pluginManager,
       tabbedMenu: tabbedMenu,
       compile: new CompileTab(self._components.registry),
       run: new RunTab(self._components.registry),
-      settings: new SettingsTab(self._components.registry),
-      analysis: analysisTab,
-      debug: self._components.debuggerTab,
-      support: new SupportTab(self._components.registry),
-      test: new TestTab(self._components.registry)
+      settings: new SettingsTab(self._components.registry)
+//      analysis: analysisTab,
+//      debug: self._components.debuggerTab,
+//      support: new SupportTab(self._components.registry),
+//      test: new TestTab(self._components.registry)
     }
 
     self._components.settings.event.register('plugin-loadRequest', json => {
@@ -98,11 +98,11 @@ module.exports = class RighthandPanel {
     const { compile, run, settings, analysis, debug, support, test } = self._components
     self._components.tabbedMenu.addTab('Compile', 'compileView', compile.render())
     self._components.tabbedMenu.addTab('Run', 'runView', run.render())
-    self._components.tabbedMenu.addTab('Analysis', 'staticanalysisView', analysis.render())
-    self._components.tabbedMenu.addTab('Testing', 'testView', test.render())
-    self._components.tabbedMenu.addTab('Debugger', 'debugView', debug.render())
+//    self._components.tabbedMenu.addTab('Analysis', 'staticanalysisView', analysis.render())
+//    self._components.tabbedMenu.addTab('Testing', 'testView', test.render())
+//    self._components.tabbedMenu.addTab('Debugger', 'debugView', debug.render())
     self._components.tabbedMenu.addTab('Settings', 'settingsView', settings.render())
-    self._components.tabbedMenu.addTab('Support', 'supportView', support.render())
+//    self._components.tabbedMenu.addTab('Support', 'supportView', support.render())
     self._components.tabbedMenu.selectTabByTitle('Compile')
   }
   // showDebugger () {

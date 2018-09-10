@@ -2,8 +2,6 @@
 const yo = require('yo-yo')
 const csjs = require('csjs-inject')
 const copy = require('clipboard-copy')
-var minixhr = require('minixhr')
-var tooltip = require('../ui/tooltip')
 var QueryParams = require('../../lib/query-params')
 var globalRegistry = require('../../global/registry')
 const TreeView = require('../ui/TreeView')
@@ -61,9 +59,9 @@ module.exports = class CompileTab {
       selectedVersion: null,
       baseurl: 'https://solc-bin.ethereum.org/bin'
     }
-    self.data.optimize = !!self._components.queryParams.get().optimize
-    self._components.queryParams.update({ optimize: self.data.optimize })
-    self._deps.compiler.setOptimize(self.data.optimize)
+    self.data.optimize = false
+//    self._components.queryParams.update({ optimize: self.data.optimize })
+    self._deps.compiler.setOptimize(false)
 
     self._deps.editor.event.register('contentChanged', scheduleCompilation)
     self._deps.editor.event.register('sessionSwitched', scheduleCompilation)
@@ -185,9 +183,6 @@ module.exports = class CompileTab {
       if (self._view.versionSelector) self._updateVersionSelector()
     })
 
-    self._view.optimize = yo`<input onchange=${onchangeOptimize} id="optimize" type="checkbox">`
-    if (self.data.optimize) self._view.optimize.setAttribute('checked', '')
-
     self._view.versionSelector = yo`
       <select onchange=${onchangeLoadVersion} class="${css.select}" id="versionSelector" disabled>
         <option disabled selected>Select new compiler version</option>
@@ -219,10 +214,6 @@ module.exports = class CompileTab {
           <div class="${css.autocompileContainer}">
             ${self._view.autoCompile}
             <span class="${css.autocompileText}">Auto compile</span>
-          </div>
-          <div class="${css.crow}">
-            <div>${self._view.optimize}</div>
-            <span class="${css.checkboxText}">Enable Optimization</span>
           </div>
           <div class=${css.hideWarningsContainer}>
             ${self._view.hideWarningsBox}
@@ -421,25 +412,10 @@ module.exports = class CompileTab {
     }
   }
   fetchAllVersion (callback) {
-    var self = this
-    minixhr(`${self.data.baseurl}/list.json`, function (json, event) {
-      // @TODO: optimise and cache results to improve app loading times
-      var allversions, selectedVersion
-      if (event.type !== 'error') {
-        try {
-          const data = JSON.parse(json)
-          allversions = data.builds.slice().reverse()
-          selectedVersion = data.releases[data.latestRelease]
-          if (self._components.queryParams.get().version) selectedVersion = self._components.queryParams.get().version
-        } catch (e) {
-          tooltip('Cannot load compiler version list. It might have been blocked by an advertisement blocker. Please try deactivating any of them from this page and reload.')
-        }
-      } else {
-        allversions = [{ path: 'builtin', longVersion: 'latest local version' }]
-        selectedVersion = 'builtin'
-      }
-      callback(allversions, selectedVersion)
-    })
+    var allversions, selectedVersion
+    allversions = [{ path: 'builtin', longVersion: 'latest local version' }]
+    selectedVersion = 'builtin'
+    callback(allversions, selectedVersion)
   }
 }
 
