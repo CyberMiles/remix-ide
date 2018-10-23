@@ -97,7 +97,7 @@ var gethDeploy = function (contractName, jsonInterface, bytecode) {
   })
 
   contractName = contractName.replace(/[:./]/g, '_')
-  code += 'var ' + contractName + 'Contract = web3.eth.contract(' + JSON.stringify(jsonInterface).replace('\n', '') + ');' +
+  code += 'var ' + contractName + 'Contract = web3.cmt.contract(' + JSON.stringify(jsonInterface).replace('\n', '') + ');' +
     '\nvar ' + contractName + ' = ' + contractName + 'Contract.new('
 
   funABI.inputs.forEach(function (inp) {
@@ -105,7 +105,7 @@ var gethDeploy = function (contractName, jsonInterface, bytecode) {
   })
 
   code += '\n   {' +
-    '\n     from: web3.eth.accounts[0], ' +
+    '\n     from: web3.cmt.accounts[0], ' +
     "\n     data: '0x" + bytecode + "', " +
     "\n     gas: '4700000'" +
     '\n   }, function (e, contract){' +
