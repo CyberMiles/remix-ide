@@ -48,9 +48,9 @@ function runTab (opts, localRegistry) {
         var select = document.getElementById('unit')
         var index = select.selectedIndex
         var selectedUnit = select.querySelectorAll('option')[index].dataset.unit
-        var unit = 'ether' // default
-        if (selectedUnit === 'ether') {
-          unit = 'ether'
+        var unit = 'cmt' // default
+        if (selectedUnit === 'cmt') {
+          unit = 'cmt'
         } else if (selectedUnit === 'finney') {
           unit = 'finney'
         } else if (selectedUnit === 'gwei') {
@@ -550,7 +550,7 @@ function settings (container, self) {
         <option data-unit="wei">wei</option>
         <option data-unit="gwei">gwei</option>
         <option data-unit="finney">finney</option>
-        <option data-unit="ether">ether</option>
+        <option data-unit="cmt">cmt</option>
       </select>
     </div>
   `
@@ -592,7 +592,7 @@ function settings (container, self) {
   selectExEnv.addEventListener('change', function (event) {
     let context = selectExEnv.options[selectExEnv.selectedIndex].value
     executionContext.executionContextChange(context, null, () => {
-      modalDialogCustom.confirm(null, 'Are you sure you want to connect to an ethereum node?', () => {
+      modalDialogCustom.confirm(null, 'Are you sure you want to connect to an CyberMiles node?', () => {
         modalDialogCustom.prompt(null, 'Web3 Provider Endpoint', 'http://localhost:8545', (target) => {
           executionContext.setProviderFromEndpoint(target, context, (alertMsg) => {
             if (alertMsg) {
