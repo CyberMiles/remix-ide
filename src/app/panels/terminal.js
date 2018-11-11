@@ -352,9 +352,9 @@ class Terminal {
                     <li>Checking transactions details and start debugging.</li>
                     <li>Running JavaScript scripts. The following libraries are accessible:
                       <ul class=${css2.ul}>
-                        <li><a target="_blank" href="https://web3js.readthedocs.io/en/1.0/">web3 version 1.0.0</a></li>
-                        <li><a target="_blank" href="https://docs.ethers.io/ethers.js/html/">ethers.js</a> </li>
-                        <li><a target="_blank" href="https://www.npmjs.com/package/swarmgw">swarmgw</a> </li>
+                        <li><a target="_blank" href="https://www.litylang.org/">Lity Language</a></li>
+                        <li><a target="_blank" href="https://github.com/CyberMiles/web3-cmt.js">Web3-CMT.js</a> </li>
+                        <li><a target="_blank" href="https://www.cybermiles.io/metamask/">Metamask for CMT</a> </li>
                       </ul>
                     </li>
                     <li>Executing common command to interact with the Remix interface (see list of commands above). Note that these commands can also be included and run from a JavaScript script.</li>
