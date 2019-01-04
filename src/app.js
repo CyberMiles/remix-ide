@@ -236,8 +236,8 @@ class App {
     self._components.editorpanel.getEditor().clearAnnotations()
     var currentFile = self._components.config.get('currentFile')
     if (currentFile) {
-      if (/.(.sol)$/.exec(currentFile)) {
-        // only compile *.sol file.
+      if (/\.(sol|lity)$/.exec(currentFile)) {
+        // compile *.sol and *.lity files
         var target = currentFile
         var sources = {}
         var provider = self._components.fileManager.fileProviderOf(currentFile)
