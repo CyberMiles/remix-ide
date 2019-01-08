@@ -57,7 +57,7 @@ var css = csjs`
     overflow-y        : auto;
     font-family       : monospace;
     margin            : 0px;
-    background-image    : ${styles.terminal.backgroundImage_Terminal};
+    // background-image    : ${styles.terminal.backgroundImage_Terminal};
     background-repeat   : no-repeat;
     background-position : center 15%;
     background-size     : auto calc(75% -  1.7em);
