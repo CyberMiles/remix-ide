@@ -80,7 +80,7 @@ function filepanel (localRegistry) {
   function remixdDialog () {
     return yo`
       <div class=${css.dialog}>
-        <div class=${css.dialogParagraph}>Interact with your file system from Remix. Click connect and find shared folder in the Remix file explorer (under localhost).
+        <div class=${css.dialogParagraph}>Interact with your file system from Europa. Click connect and find shared folder in the Europa file explorer (under localhost).
           Before you get started, check out <a target="_blank" href="https://remix.readthedocs.io/en/latest/tutorial_remixd_filesystem.html">Tutorial_remixd_filesystem</a>
           to find out how to run Remixd.
         </div>
@@ -114,7 +114,7 @@ function filepanel (localRegistry) {
             <span class="${css.gist}" title="Update the current [gist] explorer" onclick=${() => updateGist()}>
               <i class="fa fa-github"></i>
             </span>
-            <span class="${css.copyFiles}" title="Copy all files to another instance of Remix IDE" onclick=${copyFiles}>
+            <span class="${css.copyFiles}" title="Copy all files to another instance of Europa IDE" onclick=${copyFiles}>
               <i class="fa fa-files-o" aria-hidden="true"></i>
             </span>
             <span onclick=${connectToLocalhost} class="${css.connectToLocalhost}">
@@ -338,9 +338,9 @@ function filepanel (localRegistry) {
       } else {
         var tokenAccess = self._deps.config.get('settings/gist-access-token')
         if (!tokenAccess) {
-          modalDialogCustom.alert('Remix requires an access token (which includes gists creation permission). Please go to the settings tab for more information.')
+          modalDialogCustom.alert('Europa requires an access token (which includes gists creation permission). Please go to the settings tab for more information.')
         } else {
-          var description = 'Created using remix-ide: Realtime Ethereum Contract Compiler and Runtime. \n Load this file by pasting this gists URL or ID at https://remix.ethereum.org/#version=' + queryParams.get().version + '&optimize=' + queryParams.get().optimize + '&gist='
+          var description = 'Created using europa-ide: Realtime CyberMiles Contract Compiler and Runtime. \n Load this file by pasting this gists URL or ID at http://europa.cybermiles.io/#version=' + queryParams.get().version + '&optimize=' + queryParams.get().optimize + '&gist='
           var gists = new Gists({
             token: tokenAccess
           })
@@ -386,7 +386,7 @@ function filepanel (localRegistry) {
   // ------------------ copy files --------------
 
   function copyFiles () {
-    modalDialogCustom.prompt(null, 'To which other remix-ide instance do you want to copy over all files?', 'https://remix.ethereum.org', (target) => {
+    modalDialogCustom.prompt(null, 'To which other europa-ide instance do you want to copy over all files?', 'http://europa.cybermiles.io', (target) => {
       doCopy(target)
     })
     function doCopy (target) {

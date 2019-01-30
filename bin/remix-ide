@@ -12,5 +12,5 @@ server.listen(8080, '127.0.0.1', function () {})
 var router = new remixd.Router()
 router.start(folder)
 
-console.log('\x1b[33m%s\x1b[0m', 'Starting Remix IDE at http://localhost:8080 and sharing ' + folder)
+console.log('\x1b[33m%s\x1b[0m', 'Starting Europa IDE at http://localhost:8080 and sharing ' + folder)
 

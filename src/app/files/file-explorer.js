@@ -32,16 +32,16 @@ function fileExplorer (localRegistry, files) {
     fileManager: self._components.registry.get('filemanager').api
   }
 
-  // warn if file changed outside of Remix
+  // warn if file changed outside of Europa
   function remixdDialog () {
-    return yo`<div>This file has been changed outside of Remix IDE.</div>`
+    return yo`<div>This file has been changed outside of Europa IDE.</div>`
   }
 
   this.files.event.register('fileExternallyChanged', (path, file) => {
     if (self._deps.config.get('currentFile') === path && self._deps.editor.currentContent() && self._deps.editor.currentContent() !== file.content) {
       modalDialog(path + ' changed', remixdDialog(),
         {
-          label: 'Keep the content displayed in Remix',
+          label: 'Keep the content displayed in Europa',
           fn: () => {}
         },
         {

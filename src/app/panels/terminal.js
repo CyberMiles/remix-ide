@@ -131,7 +131,7 @@ class Terminal {
           <div class=${css.verticalLine}></div>
           <div class=${css.listen}>
             <input onchange=${listenOnNetwork} type="checkbox"
-            title="If checked Remix will listen on all transactions mined in the current environment and not only transactions created by you">
+            title="If checked Europa will listen on all transactions mined in the current environment and not only transactions created by you">
           </div>
           ${self._view.dropdown}
           <div class=${css.search}>
@@ -346,7 +346,7 @@ class Terminal {
     self._cmdIndex = -1
     self._cmdTemp = ''
 
-    var intro = yo`<div><div> - Welcome to Remix v0.6.4 - </div><br>
+    var intro = yo`<div><div> - Welcome to Europa v0.6.4 - </div><br>
                   <div>You can use this terminal for: </div>
                   <ul class=${css2.ul}>
                     <li>Checking transactions details and start debugging.</li>
@@ -357,7 +357,7 @@ class Terminal {
                         <li><a target="_blank" href="https://www.cybermiles.io/metamask/">Metamask for CMT</a> </li>
                       </ul>
                     </li>
-                    <li>Executing common command to interact with the Remix interface (see list of commands above). Note that these commands can also be included and run from a JavaScript script.</li>
+                    <li>Executing common command to interact with the Europa interface (see list of commands above). Note that these commands can also be included and run from a JavaScript script.</li>
                   </ul>
                   </div>`
 

@@ -57,10 +57,10 @@ module.exports = class SettingsTab {
     self._view.personal = yo`<input onchange=${onchangePersonal} id="personal" type="checkbox">`
     if (self._deps.config.get('settings/personal-mode')) self._view.personal.setAttribute('checked', '')
     var warnText = `Transaction sent over Web3 will use the web3.personal API - be sure the endpoint is opened before enabling it.
-    This mode allows to provide the passphrase in the Remix interface without having to unlock the account.
-    Although this is very convenient, you should completely trust the backend you are connected to (Geth, Parity, ...).
-    It is not recommended (and also most likely not relevant) to use this mode with an injected provider (Mist, Metamask, ...) or with JavaScript VM.
-    Remix never persist any passphrase.`.split('\n').map(s => s.trim()).join(' ')
+    This mode allows to provide the passphrase in the Europa interface without having to unlock the account.
+    Although this is very convenient, you should completely trust the backend you are connected to.
+    It is not recommended (and also most likely not relevant) to use this mode with an injected provider (Venus, ...) or with JavaScript VM.
+    Europa never persist any passphrase.`.split('\n').map(s => s.trim()).join(' ')
     self._view.warnPersonalMode = yo`<i title=${warnText} class="${css.icon} fa fa-exclamation-triangle" aria-hidden="true"></i>`
     self._view.generateContractMetadata = yo`<input onchange=${onchangeGenerateContractMetadata} id="generatecontractmetadata" type="checkbox">`
     if (self._deps.config.get('settings/generate-contract-metadata')) self._view.generateContractMetadata.setAttribute('checked', '')
@@ -75,11 +75,11 @@ module.exports = class SettingsTab {
           <div class=${css.title}>General settings</div>
           <div class="${css.crow}">
             <div>${self._view.generateContractMetadata}</div>
-            <span class="${css.checkboxText}">Generate contract metadata. Generate a JSON file in the contract folder. Allows to specify library addresses the contract depends on. If nothing is specified, Remix deploy libraries automatically.</span>
+            <span class="${css.checkboxText}">Generate contract metadata. Generate a JSON file in the contract folder. Allows to specify library addresses the contract depends on. If nothing is specified, Europa deploy libraries automatically.</span>
           </div>
           <div class="${css.crow}">
             <div>${self._view.optionVM}</div>
-            <span class="${css.checkboxText}">Always use Ethereum VM at Load</span>
+            <span class="${css.checkboxText}">Always use CyberMiles VM at Load</span>
           </div>
           <div class="${css.crow}">
             <div><input id="editorWrap" type="checkbox" onchange=${function () { self._deps.editor.resize(this.checked) }}></div>
@@ -95,7 +95,7 @@ module.exports = class SettingsTab {
       <div class="${css.info}">
         <div class=${css.title}>Gist Access Token</div>
         <div class="${css.crowNoFlex}">Manage the access token used to publish to Gist.</div>
-        <div class="${css.crowNoFlex}">Go to github token page (link below) to create a new token and save it in Remix. Make sure this token has only 'create gist' permission.</div>
+        <div class="${css.crowNoFlex}">Go to github token page (link below) to create a new token and save it in Europa. Make sure this token has only 'create gist' permission.</div>
         <div class="${css.crowNoFlex}"><a target="_blank" href="https://github.com/settings/tokens">https://github.com/settings/tokens</a></div>
         <div class="${css.crowNoFlex}">${self._view.gistToken}</div>
       </div>`

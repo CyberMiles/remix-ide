@@ -536,7 +536,7 @@ Please make a backup of your contracts and start using http://remix.ethereum.org
     if (queryParams.get().pluginurl) {
       var title = queryParams.get().plugintitle
       var url = queryParams.get().pluginurl
-      modalDialogCustom.confirm(null, `Remix is going to load the extension "${title}" located at ${queryParams.get().pluginurl}. Are you sure to load this external extension?`, () => {
+      modalDialogCustom.confirm(null, `Europa is going to load the extension "${title}" located at ${queryParams.get().pluginurl}. Are you sure to load this external extension?`, () => {
         self._components.righthandpanel.loadPlugin({title, url})
       })
     }
@@ -553,7 +553,7 @@ Please make a backup of your contracts and start using http://remix.ethereum.org
       if (error) console.error(error)
       if (Object.keys(filesList).length === 0) {
         if (!self._components.filesProviders['browser'].set(examples.ballot.name, examples.ballot.content)) {
-          modalDialogCustom.alert('Failed to store example contract in browser. Remix will not work properly. Please ensure Remix has access to LocalStorage. Safari in Private mode is known not to work.')
+          modalDialogCustom.alert('Failed to store example contract in browser. Europa will not work properly. Please ensure Europa has access to LocalStorage. Safari in Private mode is known not to work.')
         } else {
           self._components.filesProviders['browser'].set(examples.ballot_test.name, examples.ballot_test.content)
         }
