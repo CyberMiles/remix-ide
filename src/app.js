@@ -137,7 +137,7 @@ class App {
     registry.put({api: self._components.filesProviders['browser'], name: 'fileproviders/browser'})
     registry.put({api: self._components.filesProviders['config'], name: 'fileproviders/config'})
 
-    var remixd = new Remixd()
+    var remixd = new Remixd(65520)
     registry.put({api: remixd, name: 'remixd'})
     remixd.event.register('system', (message) => {
       if (message.error) toolTip(message.error)
@@ -230,7 +230,7 @@ class App {
   }
   runCompiler () {
     const self = this
-    if (self._components.righthandpanel.debugger().isActive) return
+    if (self._components.righthandpanel.debugger().isDebuggerActive()) return
 
     self._components.fileManager.saveCurrentFile()
     self._components.editorpanel.getEditor().clearAnnotations()
@@ -339,9 +339,9 @@ class App {
       var splitted = /([^/]+)\/(.*)$/g.exec(url)
       async.tryEach([
         (cb) => { self.importFileCb('localhost/installed_contracts/' + url, cb) },
-        (cb) => { if (!splitted) { cb('url not parseable' + url) } else { self.importFileCb('localhost/installed_contracts/' + splitted[1] + '/contracts/' + splitted[2], cb) } },
+        (cb) => { if (!splitted) { cb('URL not parseable: ' + url) } else { self.importFileCb('localhost/installed_contracts/' + splitted[1] + '/contracts/' + splitted[2], cb) } },
         (cb) => { self.importFileCb('localhost/node_modules/' + url, cb) },
-        (cb) => { if (!splitted) { cb('url not parseable' + url) } else { self.importFileCb('localhost/node_modules/' + splitted[1] + '/contracts/' + splitted[2], cb) } }],
+        (cb) => { if (!splitted) { cb('URL not parseable: ' + url) } else { self.importFileCb('localhost/node_modules/' + splitted[1] + '/contracts/' + splitted[2], cb) } }],
         (error, result) => { filecb(error, result) }
       )
     } else {
@@ -359,8 +359,7 @@ function run () {
     modalDialogCustom.alert('This UNSTABLE ALPHA branch of Remix has been moved to http://ethereum.github.io/remix-live-alpha.')
   } else if (window.location.hostname === 'remix-alpha.ethereum.org' ||
   (window.location.hostname === 'ethereum.github.io' && window.location.pathname.indexOf('/remix-live-alpha') === 0)) {
-    modalDialogCustom.alert(`This instance of the Remix IDE is an UNSTABLE ALPHA branch.\n
-Please only use it if you know what you are doing, otherwise visit the stable version at http://remix.ethereum.org.`)
+    modalDialogCustom.alert(`Welcome to the Remix alpha instance. Please use it to try out latest features. But use preferably https://remix.ethereum.org for any production work.`)
   } else if (window.location.protocol.indexOf('http') === 0 &&
   window.location.hostname !== 'remix.ethereum.org' &&
   window.location.hostname !== 'localhost' &&
@@ -396,6 +395,9 @@ Please make a backup of your contracts and start using http://remix.ethereum.org
   var offsetToLineColumnConverter = new OffsetToLineColumnConverter(self._components.compiler.event)
   registry.put({api: offsetToLineColumnConverter, name: 'offsettolinecolumnconverter'})
 
+  self._components.compilersArtefacts = {} // store all the possible compilation data (key represent a compiler name)
+  registry.put({api: self._components.compilersArtefacts, name: 'compilersartefacts'})
+
   // ----------------- UniversalDApp -----------------
   var udapp = new UniversalDApp({
     removable: false,
@@ -412,9 +414,7 @@ Please make a backup of your contracts and start using http://remix.ethereum.org
   var txlistener = new Txlistener({
     api: {
       contracts: function () {
-        if (self._components.compiler.lastCompilationResult && self._components.compiler.lastCompilationResult.data) {
-          return self._components.compiler.lastCompilationResult.data.contracts
-        }
+        if (self._components.compilersArtefacts['__last']) return self._components.compilersArtefacts['__last'].getContracts()
         return null
       },
       resolveReceipt: function (tx, cb) {

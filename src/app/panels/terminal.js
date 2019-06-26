@@ -93,7 +93,7 @@ class Terminal {
     self.registerFilter('script', basicFilter)
 
     self._jsSandboxContext = {}
-    self._jsSandbox = vm.createContext(self._jsSandboxContext)
+    self._jsSandboxRegistered = {}
     if (opts.shell) self._shell = opts.shell
     register(self)
   }
@@ -102,7 +102,7 @@ class Terminal {
     if (self._view.el) return self._view.el
     self._view.journal = yo`<div class=${css.journal}></div>`
     self._view.input = yo`
-      <span class=${css.input} contenteditable="true" onkeydown=${change}></span>
+      <span class=${css.input} contenteditable="true" onpaste=${paste} onkeydown=${change}></span>
     `
     self._view.input.innerText = '\n'
     self._view.cli = yo`
@@ -141,14 +141,6 @@ class Terminal {
         </div>
       </div>
     `
-    setInterval(() => {
-      self._view.pendingTxCount.innerHTML = self._opts.udapp.pendingTransactionsCount()
-    }, 1000)
-
-    function listenOnNetwork (ev) {
-      self.event.trigger('listenOnNetWork', [ev.currentTarget.checked])
-    }
-
     self._view.term = yo`
       <div class=${css.terminal_container} onscroll=${throttle(reattach, 10)} onclick=${focusinput}>
         <div class=${css.terminal}>
@@ -163,7 +155,38 @@ class Terminal {
         ${self._view.term}
       </div>
     `
+    setInterval(() => {
+      self._view.pendingTxCount.innerHTML = self._opts.udapp.pendingTransactionsCount()
+    }, 1000)
 
+    function listenOnNetwork (ev) {
+      self.event.trigger('listenOnNetWork', [ev.currentTarget.checked])
+    }
+    function paste (event) {
+      const selection = window.getSelection()
+      if (!selection.rangeCount) return false
+      event.preventDefault()
+      event.stopPropagation()
+      var clipboard = (event.clipboardData || window.clipboardData)
+      var text = clipboard.getData('text/plain')
+      text = text.replace(/[^\x20-\xFF]/gi, '') // remove non-UTF-8 characters
+      var temp = document.createElement('div')
+      temp.innerHTML = text
+      var textnode = document.createTextNode(temp.textContent)
+      selection.getRangeAt(0).insertNode(textnode)
+      selection.empty()
+      self.scroll2bottom()
+      placeCaretAtEnd(event.currentTarget)
+    }
+    function placeCaretAtEnd (el) {
+      el.focus()
+      var range = document.createRange()
+      range.selectNodeContents(el)
+      range.collapse(false)
+      var sel = window.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
     function throttle (fn, wait) {
       var time = Date.now()
       return function debounce () {
@@ -346,7 +369,7 @@ class Terminal {
     self._cmdIndex = -1
     self._cmdTemp = ''
 
-    var intro = yo`<div><div> - Welcome to Remix v0.6.4 - </div><br>
+    var intro = yo`<div><div> - Welcome to Remix v0.7.5 - </div><br>
                   <div>You can use this terminal for: </div>
                   <ul class=${css2.ul}>
                     <li>Checking transactions details and start debugging.</li>
@@ -355,9 +378,11 @@ class Terminal {
                         <li><a target="_blank" href="https://web3js.readthedocs.io/en/1.0/">web3 version 1.0.0</a></li>
                         <li><a target="_blank" href="https://docs.ethers.io/ethers.js/html/">ethers.js</a> </li>
                         <li><a target="_blank" href="https://www.npmjs.com/package/swarmgw">swarmgw</a> </li>
+                        <li>compilers - contains currently loaded compiler</li>
                       </ul>
                     </li>
                     <li>Executing common command to interact with the Remix interface (see list of commands above). Note that these commands can also be included and run from a JavaScript script.</li>
+                    <li>Use exports/.register(key, obj)/.remove(key)/.clear() to register and reuse object across script executions.</li>
                   </ul>
                   </div>`
 
@@ -578,7 +603,7 @@ class Terminal {
     var self = this
     var context = domTerminalFeatures(self, scopedCommands)
     try {
-      var cmds = vm.createContext(Object.assign(self._jsSandboxContext, context))
+      var cmds = vm.createContext(Object.assign(self._jsSandboxContext, context, self._jsSandboxRegistered))
       var result = vm.runInContext(script, cmds)
       self._jsSandboxContext = Object.assign(cmds, context)
       done(null, result)
@@ -590,6 +615,7 @@ class Terminal {
 
 function domTerminalFeatures (self, scopedCommands) {
   return {
+    compilers: self._opts.compilers,
     swarmgw,
     ethers,
     remix: self._components.cmdInterpreter,
@@ -607,7 +633,12 @@ function domTerminalFeatures (self, scopedCommands) {
       return setInterval(() => { self._shell('(' + fn.toString() + ')()', scopedCommands, () => {}) }, time)
     },
     clearTimeout: clearTimeout,
-    clearInterval: clearInterval
+    clearInterval: clearInterval,
+    exports: {
+      register: (key, obj) => { self._jsSandboxRegistered[key] = obj },
+      remove: (key) => { delete self._jsSandboxRegistered[key] },
+      clear: () => { self._jsSandboxRegistered = {} }
+    }
   }
 }
 

@@ -83,7 +83,9 @@ module.exports = class TestTab {
 
     function getTests (self, cb) {
       var path = self._deps.fileManager.currentPath()
+      if (!path) return cb(null, [])
       var provider = self._deps.fileManager.fileProviderOf(path)
+      if (!provider) return cb(null, [])
       var tests = []
       self._deps.fileManager.filesFromPath(path, (error, files) => {
         if (error) return cb(error)
@@ -166,8 +168,9 @@ module.exports = class TestTab {
       <div class="${css.testTabView}" id="testView">
         <div class="${css.infoBox}">
         <div class="${css.title}">Unit Testing</div>
-          Test your smart contract by creating a foo_test.sol file. Open ballot_test.sol to see the example.
+          Test your smart contract by creating a foo_test.sol file (open ballot_test.sol to see the example).
           <br/>
+          You will find more informations in the <a href="https://remix.readthedocs.io/en/latest/unittesting_tab.html">documentation</a>
           Then use the stand alone NPM module remix-tests to run unit tests in your Continuous Integration
           <a href="https://www.npmjs.com/package/remix-tests">https://www.npmjs.com/package/remix-tests</a>.
           <br/>
@@ -190,42 +193,44 @@ module.exports = class TestTab {
   }
 }
 
-var testContractSample = `pragma solidity ^0.4.0;
+var testContractSample = `pragma solidity >=0.4.0 <0.6.0;
 import "remix_tests.sol"; // this import is automatically injected by Remix.
 
 // file name has to end with '_test.sol'
 contract test_1 {
-    
-    function beforeAll () {
-      // here should instanciate tested contract
-    }
-    
-    function check1 () public {
-      // this function is not constant, use 'Assert' to test the contract
-      Assert.equal(uint(2), uint(1), "error message");
-      Assert.equal(uint(2), uint(2), "error message");
-    }
-    
-    function check2 () public constant returns (bool) {
-      // this function is constant, use the return value (true or false) to test the contract
-      return true;
-    }
+
+  function beforeAll() public {
+    // here should instantiate tested contract
+    Assert.equal(uint(4), uint(3), "error in before all function");
+  }
+
+  function check1() public {
+    // use 'Assert' to test the contract
+    Assert.equal(uint(2), uint(1), "error message");
+    Assert.equal(uint(2), uint(2), "error message");
+  }
+
+  function check2() public view returns (bool) {
+    // use the return value (true or false) to test the contract
+    return true;
+  }
 }
 
 contract test_2 {
-   
-    function beforeAll () {
-      // here should instanciate tested contract
-    }
-    
-    function check1 () public {
-      // this function is not constant, use 'Assert' to test the contract
-      Assert.equal(uint(2), uint(1), "error message");
-      Assert.equal(uint(2), uint(2), "error message");
-    }
-    
-    function check2 () public constant returns (bool) {
-      // this function is constant, use the return value (true or false) to test the contract
-      return true;
-    }
+ 
+  function beforeAll() public {
+    // here should instantiate tested contract
+    Assert.equal(uint(4), uint(3), "error in before all function");
+  }
+
+  function check1() public {
+    // use 'Assert' to test the contract
+    Assert.equal(uint(2), uint(1), "error message");
+    Assert.equal(uint(2), uint(2), "error message");
+  }
+
+  function check2() public view returns (bool) {
+    // use the return value (true or false) to test the contract
+    return true;
+  }
 }`

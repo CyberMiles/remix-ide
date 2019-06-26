@@ -40,6 +40,8 @@ class FileManager {
     self._deps.localhostExplorer.event.register('fileRemoved', (path) => { this.fileRemovedEvent(path) })
     self._deps.configExplorer.event.register('fileRemoved', (path) => { this.fileRemovedEvent(path) })
     self._deps.gistExplorer.event.register('fileRemoved', (path) => { this.fileRemovedEvent(path) })
+    self._deps.localhostExplorer.event.register('errored', (event) => { this.removeTabsOf(self._deps.localhostExplorer) })
+    self._deps.localhostExplorer.event.register('closed', (event) => { this.removeTabsOf(self._deps.localhostExplorer) })
   }
 
   fileRenamedEvent (oldName, newName, isFolder) {
@@ -92,12 +94,21 @@ class FileManager {
     return path ? path[1] : null
   }
 
+  removeTabsOf (provider) {
+    for (var tab in this.tabbedFiles) {
+      if (this.fileProviderOf(tab).type === provider.type) {
+        this.fileRemovedEvent(tab)
+      }
+    }
+  }
+
   fileRemovedEvent (path) {
     var self = this
+    if (!this.tabbedFiles[path]) return
     if (path === self._deps.config.get('currentFile')) {
       self._deps.config.set('currentFile', '')
     }
-    self._deps.editor.discardCurrentSession()
+    self._deps.editor.discard(path)
     delete this.tabbedFiles[path]
     this.refreshTabs()
     this.switchFile()
@@ -193,6 +204,22 @@ class FileManager {
           console.log('cannot save ' + currentFile + '. Does not belong to any explorer')
         }
       }
+    }
+  }
+
+  syncEditor (path) {
+    var self = this
+    var currentFile = this._deps.config.get('currentFile')
+    if (path !== currentFile) return
+
+    var provider = this.fileProviderOf(currentFile)
+    if (provider) {
+      provider.get(currentFile, (error, content) => {
+        if (error) console.log(error)
+        self._deps.editor.setText(content)
+      })
+    } else {
+      console.log('cannot save ' + currentFile + '. Does not belong to any explorer')
     }
   }
 }

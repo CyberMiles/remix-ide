@@ -44,7 +44,7 @@ var css = csjs`
   }
   .col1_1 {
     font-size: 12px;
-    width: 25%;
+    width: 15%;
     min-width: 75px;
     float: left;
     align-self: center;
@@ -124,19 +124,35 @@ var css = csjs`
   .button {
     display: flex;
     align-items: center;
-    margin-top: 2%;
+    margin-top: 13px;
   }
   .transaction {
     ${styles.rightPanel.runTab.button_transaction}
   }
   .atAddress {
     ${styles.rightPanel.runTab.button_atAddress}
+    min-width: 100px;
+    width: 100px;
+    font-size: 10px;
+    margin: 0;
+    word-break: inherit;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0;
+  }
+  .atAddressSect {
+    margin-top: 6px;
+  }
+  .atAddressSect input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
   .create {
     ${styles.rightPanel.runTab.button_Create}
   }
   .input {
-    ${styles.rightPanel.runTab.input_RunTab}
+    ${styles.rightPanel.runTab.input_RunTab};
+    font-size: 10px;
   }
   .noInstancesText {
     ${styles.rightPanel.runTab.box_Instance}
@@ -221,7 +237,14 @@ var css = csjs`
     justify-content: space-evenly;
     ${styles.rightPanel.runTab.box_Info_RunTab};
     width: 145px;
-}
+  }
+  .orLabel {
+    margin-left: 44px;
+  }
+  .infoDeployAction {
+    margin-left: 5px;
+    font-size: 13px;
+  }
 `
 
 module.exports = css

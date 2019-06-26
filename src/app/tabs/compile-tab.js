@@ -61,7 +61,8 @@ module.exports = class CompileTab {
       selectedVersion: null,
       baseurl: 'https://solc-bin.ethereum.org/bin'
     }
-    self.data.optimize = !!self._components.queryParams.get().optimize
+    self.data.optimize = self._components.queryParams.get().optimize
+    self.data.optimize = self.data.optimize === 'true'
     self._components.queryParams.update({ optimize: self.data.optimize })
     self._deps.compiler.setOptimize(self.data.optimize)
 
@@ -84,8 +85,6 @@ module.exports = class CompileTab {
     })
     self._deps.editor.event.register('contentChanged', function changedFile () {
       if (!self._view.compileIcon) return
-      const compileTab = document.querySelector('.compileView') // @TODO: compileView tab
-      compileTab.style.color = styles.colors.red // @TODO: compileView tab
       self._view.compileIcon.classList.add(`${css.bouncingIcon}`) // @TODO: compileView tab
     })
     self._deps.compiler.event.register('loadingCompiler', function start () {
@@ -138,6 +137,15 @@ module.exports = class CompileTab {
       if (data['error']) {
         error = true
         self._deps.renderer.error(data['error'].formattedMessage, self._view.errorContainer, {type: data['error'].severity || 'error'})
+        if (data['error'].mode === 'panic') {
+          /*
+          return modalDialogCustom.alert(yo`<div><i class="fa fa-exclamation-circle ${css.panicError}" aria-hidden="true"></i>
+                                            The compiler returned with the following internal error: <br> <b>${data['error'].formattedMessage}.<br>
+                                            The compiler might be in a non-sane state, please be careful and do not use further compilation data to deploy to mainnet.
+                                            It is heavily recommended to use another browser not affected by this issue (Firefox is known to not be affected).</b><br>
+                                            Please join <a href="https://gitter.im/ethereum/remix" target="blank" >remix gitter channel</a> for more information.</div>`)
+          */
+        }
       }
       if (data.errors && data.errors.length) {
         error = true
@@ -195,38 +203,36 @@ module.exports = class CompileTab {
     if (self.data.allversions && self.data.selectedVersion) self._updateVersionSelector()
     self._view.version = yo`<span id="version"></span>`
 
-    self._view.config.solidity = yo`
-      <div class="${css.info}">
-        <span>Current version:</span> ${self._view.version}
-        <div class="${css.crow}">
-          ${self._view.versionSelector}
-        </div>
-      </div>`
-
     self._view.warnCompilationSlow = yo`<i title="Compilation Slow" style="visibility:hidden" class="${css.warnCompilationSlow} fa fa-exclamation-triangle" aria-hidden="true"></i>`
     self._view.compileIcon = yo`<i class="fa fa-refresh ${css.icon}" aria-hidden="true"></i>`
-    self._view.compileButton = yo`<div class="${css.compileButton}" onclick=${compile} id="compile" title="Compile source code">${self._view.compileIcon} Start to compile</div>`
+    self._view.compileButton = yo`<div class="${css.compileButton}" onclick=${compile} id="compile" title="Compile source code">${self._view.compileIcon} Start to compile (Ctrl-S)</div>`
     self._view.autoCompile = yo`<input class="${css.autocompile}" onchange=${updateAutoCompile} id="autoCompile" type="checkbox" title="Auto compile">`
     self._view.hideWarningsBox = yo`<input class="${css.autocompile}" onchange=${hideWarnings} id="hideWarningsBox" type="checkbox" title="Hide warnings">`
     if (self.data.autoCompile) self._view.autoCompile.setAttribute('checked', '')
     if (self.data.hideWarnings) self._view.hideWarningsBox.setAttribute('checked', '')
     self._view.compileContainer = yo`
       <div class="${css.compileContainer}">
-      ${self._view.config.solidity}
-        <div class="${css.compileButtons}">
-          ${self._view.compileButton}
-          ${self._view.warnCompilationSlow}
-          <div class="${css.autocompileContainer}">
-            ${self._view.autoCompile}
-            <span class="${css.autocompileText}">Auto compile</span>
-          </div>
+        <div class="${css.info}">
+          <span>Current version:</span> ${self._view.version}
           <div class="${css.crow}">
-            <div>${self._view.optimize}</div>
-            <span class="${css.checkboxText}">Enable Optimization</span>
+            ${self._view.versionSelector}
           </div>
-          <div class=${css.hideWarningsContainer}>
-            ${self._view.hideWarningsBox}
-            <span class="${css.autocompileText}">Hide warnings</span>
+          <div class="${css.compileButtons}">
+            <div class=${css.checkboxes}>
+              <div class="${css.autocompileContainer}">
+                ${self._view.autoCompile}
+                <label for="autoCompile" class="${css.autocompileText}">Auto compile</label>
+              </div>
+              <div class="${css.optimizeContainer}">
+                <div>${self._view.optimize}</div>
+                <label for="optimize" class="${css.checkboxText}">Enable Optimization</label>
+              </div>
+              <div class=${css.hideWarningsContainer}>
+                ${self._view.hideWarningsBox}
+                <label for="hideWarningsBox" class="${css.autocompileText}">Hide warnings</label>
+              </div>
+            </div>
+            ${self._view.compileButton}
           </div>
         </div>
       </div>`
@@ -237,10 +243,12 @@ module.exports = class CompileTab {
       <div class="${css.container}">
         <div class="${css.contractContainer}">
           ${self._view.contractNames}
+          <div title="Publish on Swarm" class="${css.publish}" onclick=${publish}>
+            <i class="${css.copyIcon} fa fa-upload" aria-hidden="true"></i><span>Swarm</span>
+          </div>
         </div>
         <div class="${css.contractHelperButtons}">
           <div title="Display Contract Details" class="${css.details}" onclick=${details}>Details</div>
-          <div title="Publish on Swarm" class="${css.publish}" onclick=${publish}>Publish on Swarm</div>
           <div title="Copy ABI to clipboard" class="${css.copyButton}" onclick=${copyABI}>
             <i class="${css.copyIcon} fa fa-clipboard" aria-hidden="true"></i> ABI
           </div>
@@ -365,7 +373,7 @@ module.exports = class CompileTab {
         if (contract.metadata === undefined || contract.metadata.length === 0) {
           modalDialogCustom.alert('This contract does not implement all functions and thus cannot be published.')
         } else {
-          publishOnSwarm(contract, self._deps.fileManager, function (err) {
+          publishOnSwarm(contract, self._deps.fileManager, function (err, uploaded) {
             if (err) {
               try {
                 err = JSON.stringify(err)
@@ -373,7 +381,10 @@ module.exports = class CompileTab {
               modalDialogCustom.alert(yo`<span>Failed to publish metadata file to swarm, please check the Swarm gateways is available ( swarm-gateways.net ).<br />
               ${err}</span>`)
             } else {
-              modalDialogCustom.alert(yo`<span>Metadata published successfully.<br />The Swarm address of the metadata file is available in the contract details.</span>`)
+              var result = yo`<div>${uploaded.map((value) => {
+                return yo`<div><b>${value.filename}</b> : <pre>${value.output.url}</pre></div>`
+              })}</div>`
+              modalDialogCustom.alert(yo`<span>Metadata published successfully.<br> <pre>${result}</pre> </span>`)
             }
           }, function (item) { // triggered each time there's a new verified publish (means hash correspond)
             self._deps.swarmfileProvider.addReadOnly(item.hash, item.content)
@@ -444,6 +455,15 @@ module.exports = class CompileTab {
 }
 
 const css = csjs`
+  .title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 1em;
+  }
+  .panicError {
+    color: red;
+    font-size: 20px;
+  }
   .crow {
     display: flex;
     overflow: auto;
@@ -462,7 +482,7 @@ const css = csjs`
   }
   .select {
     font-weight: bold;
-    margin-top: 1em;
+    margin: 10px 0px;
     ${styles.rightPanel.settingsTab.dropdown_SelectCompiler};
   }
   .info {
@@ -509,6 +529,7 @@ const css = csjs`
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    justify-content: flex-end;
   }
   .name {
     display: flex;
@@ -516,11 +537,16 @@ const css = csjs`
   .size {
     display: flex;
   }
+  .checkboxes {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
   .compileButton {
     ${styles.rightPanel.compileTab.button_Compile};
-    width: 120px;
-    min-width: 110px;
-    margin-right: 1%;
+    width: 100%;
+    margin: 15px 0 10px 0;
     font-size: 12px;
   }
   .container {
@@ -533,20 +559,28 @@ const css = csjs`
     align-items: center;
     margin-bottom: 2%;
   }
+  .optimizeContainer {
+    display: flex;
+  }
   .contractNames {
     ${styles.rightPanel.compileTab.dropdown_CompileContract};
+    width:78%;
   }
   .contractHelperButtons {
     display: flex;
     cursor: pointer;
     text-align: center;
+    justify-content: flex-end;
+    margin: 15px 15px 10px 0;
   }
   .copyButton {
-    ${styles.rightPanel.compileTab.button_Details};
+    ${styles.rightPanel.compileTab.button_Publish};
     padding: 0 7px;
     min-width: 50px;
     width: auto;
     margin-left: 5px;
+    background-color: inherit;
+    border: inherit;
   }
   .bytecodeButton {
     min-width: 80px;
@@ -556,12 +590,14 @@ const css = csjs`
   }
   .details {
     ${styles.rightPanel.compileTab.button_Details};
+    min-width: 70px;
+    width: 80px;
   }
   .publish {
-    ${styles.rightPanel.compileTab.button_Publish};
-    margin-left: 5px;
-    margin-right: 5px;
-    width: 120px;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    cursor: pointer;
   }
   .log {
     ${styles.rightPanel.compileTab.box_CompileContainer};
@@ -596,7 +632,7 @@ const css = csjs`
     color: ${styles.rightPanel.modalDialog_text_Secondary};
   }
   .icon {
-    margin-right: 3%;
+    margin-right: 0.3em;
   }
   .spinningIcon {
     margin-right: .3em;
