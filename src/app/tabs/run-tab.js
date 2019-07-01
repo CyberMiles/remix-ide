@@ -410,7 +410,7 @@ function contractDropdown (events, self) {
       })
     }
 
-    if (selectedContract.contract.object.evm.deployedBytecode.object.length / 2 > 24576) {
+    if (selectedContract.contract.object.evm.deployedBytecode.object.length / 2 > 245760) {
       modalDialog('Contract code size over limit', yo`<div>Contract creation initialization returns data with length of more than 24576 bytes. The deployment will likely fails. <br>
       More info: <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-170.md" target="_blank">eip-170</a>
       </div>`,
